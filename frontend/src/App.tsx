@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
-import type { Guest } from "../../type";
 
 const isGuestType = (guest: unknown): guest is Guest => {
   const { guestName, content, entryID } = guest as Guest;
@@ -24,6 +23,8 @@ const isSameGuestsObject = (
   }
   return false;
 };
+
+type Guest = { guestName: string; content: string; entryID: number };
 
 type Props = {
   guest: Guest;
