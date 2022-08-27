@@ -49,13 +49,6 @@ app.get("/", async (_req: Request, res: Response) => {
   connection.end();
 });
 
-app.post("/tasks", async (req: Request, res: Response) => {
-  console.info("body:", req.body);
-  return res.status(200).send({
-    message: req.body || "Execute tasks!",
-  });
-});
-
 try {
   const port = process.env.PORT || 8080;
   app.listen(port, () => {
