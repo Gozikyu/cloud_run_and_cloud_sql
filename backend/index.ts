@@ -1,12 +1,22 @@
 import express, { Request, Response } from "express";
 import mysql from "mysql";
-import "dotenv";
+import dotenv from "dotenv";
+import cors from "cors";
+
+dotenv.config();
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/", async (_req: Request, res: Response) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTION"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   // .envファイルに環境変数を記載
   const connectionName = process.env.CONNECTION_NAME;
   const dbUser = process.env.DB_USER;
@@ -20,14 +30,20 @@ app.get("/", async (_req: Request, res: Response) => {
     database: dbName,
   });
 
-  connection.connect();
+  try {
+    connection.connect();
+  } catch (e) {
+    if (e instanceof Error) {
+      console.error(e.message);
+    }
+  }
 
   connection.query("SELECT * FROM entries;", (err: any, results: any) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
     } else {
-      res.send(JSON.stringify(results));
+      res.status(200).send(JSON.stringify(results));
     }
   });
   connection.end();
