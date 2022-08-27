@@ -15,6 +15,16 @@ const isGuestType = (guest: unknown): guest is Guest => {
   return false;
 };
 
+const isSameGuestsObject = (
+  currentGuests: Guest[],
+  incomingGuests: Guest[]
+) => {
+  if (currentGuests.toString() === incomingGuests.toString()) {
+    return true;
+  }
+  return false;
+};
+
 type Props = {
   guest: Guest;
 };
@@ -33,22 +43,28 @@ function App() {
   const [guests, setGuests] = useState<Guest[]>([]);
 
   useEffect(() => {
-    const fetchGuests = async (): Promise<Guest[]> => {
-      const guests: Guest[] = await axios.get(process.env.BACKEND_URL + "/");
-      if (guests.every((guest) => isGuestType(guest))) {
-        throw Error("invalid guest type");
+    const fetchAndSetGuests = async (): Promise<void> => {
+      const fetchedData = await axios.get(
+        process.env.REACT_APP_BACKEND_URL + "/"
+      );
+      if (isSameGuestsObject(guests, fetchedData.data)) {
+        return;
       }
-      setGuests(guests);
-      return guests;
+      setGuests(fetchedData.data);
+      if (guests.every((guest) => !isGuestType(guest))) {
+        console.log("type guard error");
+        return;
+      }
     };
-    fetchGuests();
-  }, []);
+
+    fetchAndSetGuests();
+  }, [guests]);
 
   return (
     <div className="App">
       <header className="App-header">
         <div>
-          <th>enrtyID</th>
+          <th>entryID</th>
           <th>guestName</th>
           <th>content</th>
           {guests.map((guest) => {
